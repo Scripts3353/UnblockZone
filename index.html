@@ -450,21 +450,25 @@
   <script>
     // ─────────────────────────────────────────────────
     //  ABOUT:BLANK SELF-CLOAK ON PAGE LOAD
-    //  Rewrites the current tab into about:blank so the
-    //  URL bar never shows the real site address.
+    //  Opens a new about:blank tab with the full site
+    //  written into it, then closes this original tab.
     // ─────────────────────────────────────────────────
     (function() {
-      // Only cloak if we're NOT already inside an about:blank document
-      if (window.location.href !== "about:blank") {
-        const siteHTML = document.documentElement.outerHTML;
-        // Replace current tab's document with itself but from about:blank
-        const w = window.open("about:blank", "_self");
-        // _self re-uses this tab; document.write fills it instantly
-        document.open();
-        document.write(siteHTML);
-        document.close();
-        // Push a fake history entry so back-button feels natural
-        history.replaceState(null, "", "about:blank");
+      if (sessionStorage.getItem("__cloaked")) {
+        // We're in the cloaked tab — mask the URL
+        history.replaceState(null, document.title, "about:blank");
+        return;
+      }
+      sessionStorage.setItem("__cloaked", "1");
+
+      const html = document.documentElement.outerHTML;
+      const blob = new Blob([html], { type: "text/html" });
+      const blobUrl = URL.createObjectURL(blob);
+
+      const newTab = window.open(blobUrl, "_blank");
+
+      if (newTab) {
+        setTimeout(() => window.close(), 300);
       }
     })();
 
