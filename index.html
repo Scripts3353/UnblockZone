@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    if (window.name !== '__cloaked') {
+      var w = window.open('about:blank', '_blank');
+      if (w) {
+        w.name = '__cloaked';
+        w.document.open();
+        w.document.write(
+          '<!DOCTYPE html><html><head>' +
+          '<meta charset="UTF-8"/>' +
+          '<meta name="viewport" content="width=device-width,initial-scale=1"/>' +
+          '<title>UnblockZone</title>' +
+          '<style>*{margin:0;padding:0}html,body,iframe{width:100%;height:100%;border:none;display:block;overflow:hidden;background:#0d0d0f}</style>' +
+          '</head><body>' +
+          '<iframe src="' + location.href + '" allowfullscreen></iframe>' +
+          '</body></html>'
+        );
+        w.document.close();
+        window.close();
+      }
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UnblockZone</title>
@@ -448,29 +469,6 @@
   </div>
 
   <script>
-    // ── ABOUT:BLANK SITE CLOAK ──
-    // Opens about:blank in a new tab, writes a full-screen iframe
-    // of the real site into it, then closes the original tab.
-    (function() {
-      if (window.name === "__uz_cloaked") return;
-      var realUrl = location.href;
-      var w = window.open("about:blank", "_blank");
-      if (!w) return;
-      w.name = "__uz_cloaked";
-      w.document.open();
-      w.document.write(
-        '<!DOCTYPE html><html><head>' +
-        '<meta charset="UTF-8"/>' +
-        '<meta name="viewport" content="width=device-width,initial-scale=1"/>' +
-        '<title>UnblockZone</title>' +
-        '<style>*{margin:0;padding:0}html,body,iframe{width:100%;height:100%;border:none;display:block;overflow:hidden;background:#0d0d0f}</style>' +
-        '</head><body>' +
-        '<iframe src="' + realUrl + '" allowfullscreen></iframe>' +
-        '</body></html>'
-      );
-      w.document.close();
-      window.close();
-    })();
 
     // ─────────────────────────────────────────────────
     //  GAME LIST — Add your games here!
