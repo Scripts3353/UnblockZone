@@ -32,7 +32,6 @@
       overflow-x: hidden;
     }
 
-    /* Subtle grid background */
     body::before {
       content: '';
       position: fixed;
@@ -44,6 +43,85 @@
       pointer-events: none;
       z-index: 0;
     }
+
+    /* ── NOTICE OVERLAY ── */
+    #notice-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+
+    #notice-overlay.hidden { display: none; }
+
+    .notice-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 2.2rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,229,255,0.07);
+      animation: slideUp 0.2s ease;
+    }
+
+    .notice-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(124,58,237,0.15));
+      border: 1px solid rgba(0,229,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+    }
+
+    .notice-icon svg { color: var(--accent); }
+
+    .notice-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+
+    .notice-text {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 1.6rem;
+    }
+
+    .notice-text strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .notice-btn {
+      background: linear-gradient(135deg, #00e5ff, #7c3aed);
+      border: none;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 0.7rem 1.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .notice-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .notice-btn:active { transform: translateY(0); }
 
     /* ── HEADER ── */
     header {
@@ -68,20 +146,12 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: none;
       user-select: none;
     }
 
-    .logo span {
-      color: #fff;
-      -webkit-text-fill-color: #fff;
-    }
+    .logo span { color: #fff; -webkit-text-fill-color: #fff; }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
 
     .search-bar {
       display: flex;
@@ -94,10 +164,7 @@
       transition: border-color 0.2s;
     }
 
-    .search-bar:focus-within {
-      border-color: var(--accent);
-      box-shadow: var(--glow);
-    }
+    .search-bar:focus-within { border-color: var(--accent); box-shadow: var(--glow); }
 
     .search-bar input {
       background: none;
@@ -110,8 +177,7 @@
     }
 
     .search-bar input::placeholder { color: var(--muted); }
-
-    .search-icon { color: var(--muted); font-size: 0.9rem; }
+    .search-icon { color: var(--muted); }
 
     /* ── MAIN ── */
     main {
@@ -141,14 +207,12 @@
       margin-bottom: 1.5rem;
     }
 
-    /* ── GAME GRID ── */
     .game-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 1.2rem;
     }
 
-    /* ── GAME CARD ── */
     .game-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -156,7 +220,6 @@
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      position: relative;
     }
 
     .game-card:hover {
@@ -165,9 +228,7 @@
       box-shadow: 0 8px 30px rgba(0,229,255,0.12);
     }
 
-    .game-card:hover .play-overlay {
-      opacity: 1;
-    }
+    .game-card:hover .play-overlay { opacity: 1; }
 
     .card-thumb {
       width: 100%;
@@ -185,26 +246,21 @@
       transition: transform 0.3s ease;
     }
 
-    .game-card:hover .card-thumb img {
-      transform: scale(1.05);
-    }
+    .game-card:hover .card-thumb img { transform: scale(1.05); }
 
-    /* Placeholder when no image */
     .card-thumb .thumb-placeholder {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
       background: linear-gradient(135deg, #1a1a2e, #16213e);
-      color: var(--muted);
     }
 
     .play-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 229, 255, 0.12);
+      background: rgba(0,229,255,0.12);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -224,10 +280,7 @@
       font-size: 1.1rem;
     }
 
-    .card-info {
-      padding: 0.75rem 0.9rem;
-      border-top: 1px solid var(--border);
-    }
+    .card-info { padding: 0.75rem 0.9rem; border-top: 1px solid var(--border); }
 
     .card-name {
       font-family: 'Rajdhani', sans-serif;
@@ -247,16 +300,7 @@
       letter-spacing: 0.05em;
     }
 
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      grid-column: 1/-1;
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--muted);
-    }
-
-    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-    .empty-state p { font-size: 1rem; }
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--muted); }
 
     /* ── FOOTER ── */
     footer {
@@ -282,27 +326,12 @@
       background-clip: text;
     }
 
-    .footer-text {
-      font-size: 0.8rem;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.2rem;
-    }
-
-    .footer-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.8rem;
-      transition: color 0.2s;
-    }
-
+    .footer-text { font-size: 0.8rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.2rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
     .footer-links a:hover { color: var(--accent); }
 
-    /* ── MODAL / GAME VIEWER ── */
+    /* ── GAME MODAL ── */
     #game-modal {
       display: none;
       position: fixed;
@@ -312,12 +341,12 @@
       backdrop-filter: blur(8px);
       align-items: center;
       justify-content: center;
-      animation: fadeIn 0.15s ease;
     }
 
-    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    #game-modal.open { display: flex; animation: fadeIn 0.15s ease; }
 
-    #game-modal.open { display: flex; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes slideUp { from { transform: translateY(16px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
 
     .modal-inner {
       width: 95vw;
@@ -332,8 +361,6 @@
       box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,229,255,0.05);
       animation: slideUp 0.18s ease;
     }
-
-    @keyframes slideUp { from { transform: translateY(16px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
 
     .modal-header {
       display: flex;
@@ -357,12 +384,7 @@
       text-overflow: ellipsis;
     }
 
-    .modal-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-    }
+    .modal-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 
     .modal-btn {
       display: flex;
@@ -381,12 +403,7 @@
       white-space: nowrap;
     }
 
-    .modal-btn:hover {
-      border-color: var(--accent);
-      background: var(--card-hover);
-      color: var(--accent);
-    }
-
+    .modal-btn:hover { border-color: var(--accent); background: var(--card-hover); color: var(--accent); }
     .modal-btn svg { flex-shrink: 0; }
 
     .modal-close {
@@ -405,24 +422,10 @@
       flex-shrink: 0;
     }
 
-    .modal-close:hover {
-      border-color: #ff4d6d;
-      color: #ff4d6d;
-      background: rgba(255,77,109,0.08);
-    }
+    .modal-close:hover { border-color: #ff4d6d; color: #ff4d6d; background: rgba(255,77,109,0.08); }
 
-    .modal-body {
-      flex: 1;
-      position: relative;
-      background: #000;
-    }
-
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
+    .modal-body { flex: 1; position: relative; background: #000; }
+    .modal-body iframe { width: 100%; height: 100%; border: none; display: block; }
 
     @media (max-width: 600px) {
       .logo { font-size: 1.2rem; }
@@ -434,6 +437,22 @@
   </style>
 </head>
 <body>
+
+  <!-- NOTICE OVERLAY -->
+  <div id="notice-overlay">
+    <div class="notice-box">
+      <div class="notice-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <div class="notice-title">Close Previous Tab</div>
+      <div class="notice-text">
+        Please <strong>close the previous tab</strong> you came from before continuing.<br/>This keeps your browsing history clean.
+      </div>
+      <button class="notice-btn" onclick="dismissNotice()">Got it, let's play</button>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header>
@@ -452,9 +471,7 @@
   <main>
     <div class="section-label">// Play Now</div>
     <div class="section-title">All Games</div>
-    <div class="game-grid" id="game-grid">
-      <!-- Cards injected by JS -->
-    </div>
+    <div class="game-grid" id="game-grid"></div>
   </main>
 
   <!-- FOOTER -->
@@ -481,7 +498,7 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             Reload
           </button>
-          <button class="modal-close" onclick="closeModal()" title="Close">✕</button>
+          <button class="modal-close" onclick="closeModal()" title="Close">&#x2715;</button>
         </div>
       </div>
       <div class="modal-body">
@@ -491,15 +508,10 @@
   </div>
 
   <script>
+    function dismissNotice() {
+      document.getElementById("notice-overlay").classList.add("hidden");
+    }
 
-    // ─────────────────────────────────────────────────
-    //  GAME LIST — Add your games here!
-    //  Each entry: { name, file, image, tag }
-    //    name  → display name on the card
-    //    file  → HTML file inside the /games/ folder
-    //    image → image file inside /games/images/ (optional)
-    //    tag   → genre label shown under the name
-    // ─────────────────────────────────────────────────
     const GAMES = [
       {
         name: "Clover Pit",
@@ -539,8 +551,6 @@
       },
     ];
 
-    // ── No-image placeholder (plain dark box, no emoji) ──
-
     let allGames = [...GAMES];
 
     function renderGames(list) {
@@ -548,33 +558,30 @@
       grid.innerHTML = "";
 
       if (list.length === 0) {
-        grid.innerHTML = `<div class="empty-state">
-          <p>No games found. Try a different search.</p>
-        </div>`;
+        grid.innerHTML = '<div class="empty-state"><p>No games found. Try a different search.</p></div>';
         return;
       }
 
-      list.forEach((game, i) => {
+      list.forEach(function(game) {
         const card = document.createElement("div");
         card.className = "game-card";
-        card.style.animationDelay = `${i * 40}ms`;
-        card.onclick = () => launchGame(game);
+        card.onclick = function() { launchGame(game); };
 
-        card.innerHTML = `
-          <div class="card-thumb">
-            ${game.image
-              ? `<img src="${game.image}" alt="${game.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-              : ""}
-            <div class="thumb-placeholder" ${game.image ? 'style="display:none"' : ""}></div>
-            <div class="play-overlay">
-              <div class="play-btn-icon">&#9654;</div>
-            </div>
-          </div>
-          <div class="card-info">
-            <div class="card-name">${game.name}</div>
-            <div class="card-tag">${game.tag}</div>
-          </div>
-        `;
+        const imgHTML = game.image
+          ? '<img src="' + game.image + '" alt="' + game.name + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+          : '';
+        const placeholderStyle = game.image ? ' style="display:none"' : '';
+
+        card.innerHTML =
+          '<div class="card-thumb">' +
+            imgHTML +
+            '<div class="thumb-placeholder"' + placeholderStyle + '></div>' +
+            '<div class="play-overlay"><div class="play-btn-icon">&#9654;</div></div>' +
+          '</div>' +
+          '<div class="card-info">' +
+            '<div class="card-name">' + game.name + '</div>' +
+            '<div class="card-tag">' + game.tag + '</div>' +
+          '</div>';
 
         grid.appendChild(card);
       });
@@ -583,10 +590,9 @@
     function filterGames(query) {
       const q = query.toLowerCase().trim();
       if (!q) { renderGames(allGames); return; }
-      renderGames(allGames.filter(g =>
-        g.name.toLowerCase().includes(q) ||
-        g.tag.toLowerCase().includes(q)
-      ));
+      renderGames(allGames.filter(function(g) {
+        return g.name.toLowerCase().includes(q) || g.tag.toLowerCase().includes(q);
+      }));
     }
 
     function launchGame(game) {
@@ -619,17 +625,14 @@
       else if (f.webkitRequestFullscreen) f.webkitRequestFullscreen();
     }
 
-    // Close on backdrop click
     document.getElementById("game-modal").addEventListener("click", function(e) {
       if (e.target === this) closeModal();
     });
 
-    // Close on Escape key
     document.addEventListener("keydown", function(e) {
       if (e.key === "Escape") closeModal();
     });
 
-    // Init
     renderGames(allGames);
   </script>
 </body>
