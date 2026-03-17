@@ -403,7 +403,9 @@
     <div class="logo">Unblock<span>Zone</span></div>
     <div class="header-right">
       <div class="search-bar">
-        <span class="search-icon"></span>
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
         <input type="text" id="search-input" placeholder="Search games..." oninput="filterGames(this.value)" />
       </div>
     </div>
@@ -420,8 +422,8 @@
 
   <!-- FOOTER -->
   <footer>
-    <div class="footer-logo">Unbl0ckZone</div>
-    <div class="footer-text">reboot of reallyunblocked</div>
+    <div class="footer-logo">UnblockZone</div>
+    <div class="footer-text">Free / Fast / Unblocked</div>
     <div class="footer-links">
       <a href="#">Home</a>
       <a href="#">Games</a>
@@ -435,7 +437,7 @@
       <div class="modal-header">
         <div class="modal-title" id="modal-game-title">Loading...</div>
         <div class="modal-actions">
-          <button class="modal-btn" onclick="openFullscreen()">⛶ Fullscreen</button>
+          <button class="modal-btn" onclick="openFullscreen()">Fullscreen</button>
           <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
       </div>
@@ -446,6 +448,26 @@
   </div>
 
   <script>
+    // ─────────────────────────────────────────────────
+    //  ABOUT:BLANK SELF-CLOAK ON PAGE LOAD
+    //  Rewrites the current tab into about:blank so the
+    //  URL bar never shows the real site address.
+    // ─────────────────────────────────────────────────
+    (function() {
+      // Only cloak if we're NOT already inside an about:blank document
+      if (window.location.href !== "about:blank") {
+        const siteHTML = document.documentElement.outerHTML;
+        // Replace current tab's document with itself but from about:blank
+        const w = window.open("about:blank", "_self");
+        // _self re-uses this tab; document.write fills it instantly
+        document.open();
+        document.write(siteHTML);
+        document.close();
+        // Push a fake history entry so back-button feels natural
+        history.replaceState(null, "", "about:blank");
+      }
+    })();
+
     // ─────────────────────────────────────────────────
     //  GAME LIST — Add your games here!
     //  Each entry: { name, file, image, tag }
@@ -493,12 +515,7 @@
       },
     ];
 
-    // ── Emoji fallback per tag ──
-    const TAG_EMOJIS = {
-      Action: "🔫", Puzzle: "🧩", Arcade: "👾",
-      Sports: "⚽", Strategy: "♟️", Racing: "🏎️",
-      Adventure: "🗺️", Shooter: "🎯", Default: "🎮"
-    };
+    // ── No-image placeholder (plain dark box, no emoji) ──
 
     let allGames = [...GAMES];
 
@@ -508,14 +525,12 @@
 
       if (list.length === 0) {
         grid.innerHTML = `<div class="empty-state">
-          <div class="empty-icon">🎮</div>
           <p>No games found. Try a different search.</p>
         </div>`;
         return;
       }
 
       list.forEach((game, i) => {
-        const emoji = TAG_EMOJIS[game.tag] || TAG_EMOJIS.Default;
         const card = document.createElement("div");
         card.className = "game-card";
         card.style.animationDelay = `${i * 40}ms`;
@@ -526,9 +541,9 @@
             ${game.image
               ? `<img src="${game.image}" alt="${game.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
               : ""}
-            <div class="thumb-placeholder" ${game.image ? 'style="display:none"' : ""}>${emoji}</div>
+            <div class="thumb-placeholder" ${game.image ? 'style="display:none"' : ""}></div>
             <div class="play-overlay">
-              <div class="play-btn-icon">▶</div>
+              <div class="play-btn-icon">&#9654;</div>
             </div>
           </div>
           <div class="card-info">
@@ -615,7 +630,7 @@
   <div id="bar">
     <a href="javascript:void(0)" onclick="window.close()">UnblockZone</a>
     <span>${gameName}</span>
-    <button onclick="document.getElementById('gf').requestFullscreen()">⛶ Fullscreen</button>
+    <button onclick="document.getElementById('gf').requestFullscreen()">Fullscreen</button>
   </div>
   <div id="frame-wrap">
     <iframe id="gf" src="${absoluteUrl}" allowfullscreen></iframe>
