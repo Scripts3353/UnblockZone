@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UnblockZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --surface: #141417;
+      --card: #1a1a1f;
+      --card-hover: #222228;
+      --border: #2a2a35;
+      --accent: #00e5ff;
+      --accent2: #7c3aed;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --footer-bg: #111115;
+      --glow: 0 0 20px rgba(0, 229, 255, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 0 2rem;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(13,13,15,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #00e5ff 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      user-select: none;
+    }
+
+    .logo span {
+      color: #fff;
+      -webkit-text-fill-color: #fff;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      gap: 0.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar:focus-within {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+
+    .search-bar input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.95rem;
+      width: 180px;
+    }
+
+    .search-bar input::placeholder { color: var(--muted); }
+
+    .search-icon { color: var(--muted); font-size: 0.9rem; }
+
+    /* ── MAIN ── */
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── GAME GRID ── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+
+    /* ── GAME CARD ── */
+    .game-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 30px rgba(0,229,255,0.12);
+    }
+
+    .game-card:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover .card-thumb img {
+      transform: scale(1.05);
+    }
+
+    /* Placeholder when no image */
+    .card-thumb .thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: var(--muted);
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 229, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .play-btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-size: 1.1rem;
+    }
+
+    .card-info {
+      padding: 0.75rem 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-tag {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state p { font-size: 1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 10;
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, #00e5ff, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.2rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ── MODAL / GAME VIEWER ── */
+    #game-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #game-modal.open { display: flex; }
+
+    .modal-inner {
+      width: 95vw;
+      max-width: 1100px;
+      height: 88vh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      gap: 1rem;
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text);
+      letter-spacing: 0.08em;
+    }
+
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .modal-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .modal-btn:hover { border-color: var(--accent); background: var(--card-hover); }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.3rem;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: #ff4d6d; }
+
+    .modal-body { flex: 1; position: relative; }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .logo { font-size: 1.2rem; }
+      .search-bar { display: none; }
+      .footer-links { display: none; }
+      main { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Unblock<span>Zone</span></div>
+    <div class="header-right">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search games..." oninput="filterGames(this.value)" />
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <div class="section-label">// Play Now</div>
+    <div class="section-title">All Games</div>
+    <div class="game-grid" id="game-grid">
+      <!-- Cards injected by JS -->
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">UnblockZone</div>
+    <div class="footer-text">Free · Fast · Unblocked</div>
+    <div class="footer-links">
+      <a href="#">Home</a>
+      <a href="#">Games</a>
+      <a href="#">About</a>
+    </div>
+  </footer>
+
+  <!-- GAME MODAL -->
+  <div id="game-modal">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-game-title">Loading...</div>
+        <div class="modal-actions">
+          <button class="modal-btn" onclick="openFullscreen()">⛶ Fullscreen</button>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <iframe id="game-frame" src="" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────────────
+    //  GAME LIST — Add your games here!
+    //  Each entry: { name, file, image, tag }
+    //    name  → display name on the card
+    //    file  → HTML file inside the /games/ folder
+    //    image → image file inside /games/images/ (optional)
+    //    tag   → genre label shown under the name
+    // ─────────────────────────────────────────────────
+    const GAMES = [
+      {
+        name: "Game Title 1",
+        file: "games/game1.html",
+        image: "games/images/game1.png",
+        tag: "Action"
+      },
+      {
+        name: "Game Title 2",
+        file: "games/game2.html",
+        image: "games/images/game2.png",
+        tag: "Puzzle"
+      },
+      {
+        name: "Game Title 3",
+        file: "games/game3.html",
+        image: "games/images/game3.png",
+        tag: "Arcade"
+      },
+      {
+        name: "Game Title 4",
+        file: "games/game4.html",
+        image: "games/images/game4.png",
+        tag: "Sports"
+      },
+      {
+        name: "Game Title 5",
+        file: "games/game5.html",
+        image: "games/images/game5.png",
+        tag: "Strategy"
+      },
+      {
+        name: "Game Title 6",
+        file: "games/game6.html",
+        image: "games/images/game6.png",
+        tag: "Racing"
+      },
+    ];
+
+    // ── Emoji fallback per tag ──
+    const TAG_EMOJIS = {
+      Action: "🔫", Puzzle: "🧩", Arcade: "👾",
+      Sports: "⚽", Strategy: "♟️", Racing: "🏎️",
+      Adventure: "🗺️", Shooter: "🎯", Default: "🎮"
+    };
+
+    let allGames = [...GAMES];
+
+    function renderGames(list) {
+      const grid = document.getElementById("game-grid");
+      grid.innerHTML = "";
+
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-state">
+          <div class="empty-icon">🎮</div>
+          <p>No games found. Try a different search.</p>
+        </div>`;
+        return;
+      }
+
+      list.forEach((game, i) => {
+        const emoji = TAG_EMOJIS[game.tag] || TAG_EMOJIS.Default;
+        const card = document.createElement("div");
+        card.className = "game-card";
+        card.style.animationDelay = `${i * 40}ms`;
+        card.onclick = () => launchGame(game);
+
+        card.innerHTML = `
+          <div class="card-thumb">
+            ${game.image
+              ? `<img src="${game.image}" alt="${game.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+              : ""}
+            <div class="thumb-placeholder" ${game.image ? 'style="display:none"' : ""}>${emoji}</div>
+            <div class="play-overlay">
+              <div class="play-btn-icon">▶</div>
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-name">${game.name}</div>
+            <div class="card-tag">${game.tag}</div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function filterGames(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) { renderGames(allGames); return; }
+      renderGames(allGames.filter(g =>
+        g.name.toLowerCase().includes(q) ||
+        g.tag.toLowerCase().includes(q)
+      ));
+    }
+
+    // ─────────────────────────────────────────────────
+    //  ABOUT:BLANK CLOAKING
+    //  Opens the game inside an about:blank popup so the
+    //  URL bar shows about:blank — bypassing URL filters.
+    // ─────────────────────────────────────────────────
+    function launchGame(game) {
+      const gameUrl = game.file;
+      const gameName = game.name;
+
+      // Build a full absolute URL (works on GitHub Pages)
+      const base = window.location.href.replace(/\/[^/]*$/, "/");
+      const absoluteUrl = gameUrl.startsWith("http") ? gameUrl : base + gameUrl;
+
+      // Open a blank popup window
+      const popup = window.open("about:blank", "_blank",
+        "width=" + screen.availWidth +
+        ",height=" + screen.availHeight +
+        ",left=0,top=0,toolbar=no,menubar=no,scrollbars=no,status=no"
+      );
+
+      if (!popup) {
+        // Fallback: use the inline modal if popups are blocked
+        openModal(gameUrl, gameName);
+        return;
+      }
+
+      // Write a full page into the blank window
+      popup.document.open();
+      popup.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${gameName} — UnblockZone</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;background:#0d0d0f;overflow:hidden}
+  #bar{
+    position:fixed;top:0;left:0;right:0;height:44px;
+    background:#111115;border-bottom:1px solid #2a2a35;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 1rem;z-index:9999;font-family:'Rajdhani',sans-serif;
+  }
+  #bar a{
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:0.85rem;
+    letter-spacing:0.1em;background:linear-gradient(135deg,#00e5ff,#7c3aed);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    text-decoration:none;
+  }
+  #bar span{color:#888899;font-size:0.85rem;letter-spacing:0.05em}
+  #bar button{
+    background:#1a1a1f;border:1px solid #2a2a35;color:#e8e8f0;
+    padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;
+    font-family:'Rajdhani',sans-serif;font-size:0.82rem;
+  }
+  #bar button:hover{border-color:#00e5ff}
+  #frame-wrap{position:fixed;top:44px;left:0;right:0;bottom:0}
+  iframe{width:100%;height:100%;border:none;display:block}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <div id="bar">
+    <a href="javascript:void(0)" onclick="window.close()">UnblockZone</a>
+    <span>${gameName}</span>
+    <button onclick="document.getElementById('gf').requestFullscreen()">⛶ Fullscreen</button>
+  </div>
+  <div id="frame-wrap">
+    <iframe id="gf" src="${absoluteUrl}" allowfullscreen></iframe>
+  </div>
+</body>
+</html>`);
+      popup.document.close();
+    }
+
+    // Fallback inline modal
+    function openModal(url, name) {
+      document.getElementById("modal-game-title").textContent = name;
+      document.getElementById("game-frame").src = url;
+      document.getElementById("game-modal").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("game-modal").classList.remove("open");
+      document.getElementById("game-frame").src = "";
+    }
+
+    function openFullscreen() {
+      const frame = document.getElementById("game-frame");
+      if (frame.requestFullscreen) frame.requestFullscreen();
+    }
+
+    // Close modal on backdrop click
+    document.getElementById("game-modal").addEventListener("click", function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Init
+    renderGames(allGames);
+  </script>
+</body>
+</html>
