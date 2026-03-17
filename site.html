@@ -308,32 +308,40 @@
       position: fixed;
       inset: 0;
       z-index: 100;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
       align-items: center;
       justify-content: center;
+      animation: fadeIn 0.15s ease;
     }
+
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 
     #game-modal.open { display: flex; }
 
     .modal-inner {
       width: 95vw;
-      max-width: 1100px;
-      height: 88vh;
+      max-width: 1200px;
+      height: 90vh;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,229,255,0.05);
+      animation: slideUp 0.18s ease;
     }
+
+    @keyframes slideUp { from { transform: translateY(16px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
 
     .modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.8rem 1.2rem;
+      padding: 0 1.2rem;
+      height: 48px;
+      min-height: 48px;
       border-bottom: 1px solid var(--border);
       background: var(--card);
       gap: 1rem;
@@ -341,45 +349,73 @@
 
     .modal-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text);
       letter-spacing: 0.08em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .modal-actions {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
+      flex-shrink: 0;
     }
 
     .modal-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.35rem 0.8rem;
+      padding: 0.3rem 0.75rem;
       border-radius: 6px;
       cursor: pointer;
       font-family: 'Rajdhani', sans-serif;
-      font-size: 0.85rem;
-      transition: border-color 0.2s, background 0.2s;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      white-space: nowrap;
     }
 
-    .modal-btn:hover { border-color: var(--accent); background: var(--card-hover); }
+    .modal-btn:hover {
+      border-color: var(--accent);
+      background: var(--card-hover);
+      color: var(--accent);
+    }
+
+    .modal-btn svg { flex-shrink: 0; }
 
     .modal-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
       background: none;
-      border: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       color: var(--muted);
-      font-size: 1.2rem;
+      font-size: 1rem;
       cursor: pointer;
-      padding: 0.3rem;
-      line-height: 1;
-      transition: color 0.2s;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      flex-shrink: 0;
     }
 
-    .modal-close:hover { color: #ff4d6d; }
+    .modal-close:hover {
+      border-color: #ff4d6d;
+      color: #ff4d6d;
+      background: rgba(255,77,109,0.08);
+    }
 
-    .modal-body { flex: 1; position: relative; }
+    .modal-body {
+      flex: 1;
+      position: relative;
+      background: #000;
+    }
 
     .modal-body iframe {
       width: 100%;
@@ -393,6 +429,7 @@
       .search-bar { display: none; }
       .footer-links { display: none; }
       main { padding: 1rem; }
+      .modal-inner { width: 100vw; height: 100vh; border-radius: 0; }
     }
   </style>
 </head>
@@ -437,8 +474,15 @@
       <div class="modal-header">
         <div class="modal-title" id="modal-game-title">Loading...</div>
         <div class="modal-actions">
-          <button class="modal-btn" onclick="openFullscreen()">Fullscreen</button>
-          <button class="modal-close" onclick="closeModal()">✕</button>
+          <button class="modal-btn" onclick="openFullscreen()" title="Fullscreen">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            Fullscreen
+          </button>
+          <button class="modal-btn" onclick="reloadGame()" title="Reload">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Reload
+          </button>
+          <button class="modal-close" onclick="closeModal()" title="Close">✕</button>
         </div>
       </div>
       <div class="modal-body">
@@ -546,72 +590,44 @@
       ));
     }
 
-    // ─────────────────────────────────────────────────
-    //  ABOUT:BLANK CLOAKING
-    //  Opens the game inside an about:blank popup so the
-    //  URL bar shows about:blank — bypassing URL filters.
-    // ─────────────────────────────────────────────────
     function launchGame(game) {
-      var gameUrl = game.file;
-      var gameName = game.name;
       var base = location.href.endsWith("/") ? location.href : location.href.substring(0, location.href.lastIndexOf("/") + 1);
-      var absoluteUrl = gameUrl.startsWith("http") ? gameUrl : base + gameUrl;
-
-      var popup = window.open("about:blank", "_blank",
-        "width=" + screen.availWidth + ",height=" + screen.availHeight +
-        ",left=0,top=0,toolbar=no,menubar=no,scrollbars=no,status=no"
-      );
-
-      if (!popup) { openModal(absoluteUrl, gameName); return; }
-
-      popup.document.open();
-      popup.document.write(
-        '<!DOCTYPE html><html><head>' +
-        '<meta charset="UTF-8"/>' +
-        '<meta name="viewport" content="width=device-width,initial-scale=1"/>' +
-        '<title>' + gameName + ' \u2014 UnblockZone</title>' +
-        '<style>' +
-        '*{margin:0;padding:0;box-sizing:border-box}' +
-        'html,body{width:100%;height:100%;background:#0d0d0f;overflow:hidden}' +
-        '#bar{position:fixed;top:0;left:0;right:0;height:44px;background:#111115;border-bottom:1px solid #2a2a35;display:flex;align-items:center;justify-content:space-between;padding:0 1rem;z-index:9999;font-family:sans-serif}' +
-        '#bar a{font-weight:700;font-size:0.85rem;letter-spacing:0.1em;background:linear-gradient(135deg,#00e5ff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;cursor:pointer}' +
-        '#bar span{color:#888899;font-size:0.85rem}' +
-        '#bar button{background:#1a1a1f;border:1px solid #2a2a35;color:#e8e8f0;padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.82rem}' +
-        '#bar button:hover{border-color:#00e5ff}' +
-        '#fw{position:fixed;top:44px;left:0;right:0;bottom:0}' +
-        'iframe{width:100%;height:100%;border:none;display:block}' +
-        '</style></head><body>' +
-        '<div id="bar">' +
-        '<a onclick="window.close()">UnblockZone</a>' +
-        '<span>' + gameName + '</span>' +
-        '<button onclick="document.getElementById(\'gf\').requestFullscreen()">Fullscreen</button>' +
-        '</div>' +
-        '<div id="fw"><iframe id="gf" src="' + absoluteUrl + '" allowfullscreen></iframe></div>' +
-        '</body></html>'
-      );
-      popup.document.close();
+      var absoluteUrl = game.file.startsWith("http") ? game.file : base + game.file;
+      openModal(absoluteUrl, game.name);
     }
 
-    // Fallback inline modal
     function openModal(url, name) {
       document.getElementById("modal-game-title").textContent = name;
       document.getElementById("game-frame").src = url;
       document.getElementById("game-modal").classList.add("open");
+      document.body.style.overflow = "hidden";
     }
 
     function closeModal() {
       document.getElementById("game-modal").classList.remove("open");
       document.getElementById("game-frame").src = "";
+      document.body.style.overflow = "";
+    }
+
+    function reloadGame() {
+      var f = document.getElementById("game-frame");
+      f.src = f.src;
     }
 
     function openFullscreen() {
-      const frame = document.getElementById("game-frame");
-      if (frame.requestFullscreen) frame.requestFullscreen();
+      var f = document.getElementById("game-frame");
+      if (f.requestFullscreen) f.requestFullscreen();
+      else if (f.webkitRequestFullscreen) f.webkitRequestFullscreen();
     }
 
-    // Close modal on backdrop click
+    // Close on backdrop click
     document.getElementById("game-modal").addEventListener("click", function(e) {
       if (e.target === this) closeModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeModal();
     });
 
     // Init
