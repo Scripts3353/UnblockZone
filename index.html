@@ -448,41 +448,26 @@
   </div>
 
   <script>
-    // ─────────────────────────────────────────────────
-    //  ABOUT:BLANK SELF-CLOAK ON PAGE LOAD
-    //  Opens a new about:blank tab with the full site
-    //  written into it, then closes this original tab.
-    // ─────────────────────────────────────────────────
+    // ── ABOUT:BLANK SITE CLOAK ──
+    // Opens about:blank in a new tab, writes a full-screen iframe
+    // of the real site into it, then closes the original tab.
     (function() {
-      if (window.__cloaked) return;
-      const w = window.open("about:blank", "_blank");
-      if (!w) return; // popup blocked — just show site normally
-      w.__cloaked = true;
+      if (window.name === "__uz_cloaked") return;
+      var realUrl = location.href;
+      var w = window.open("about:blank", "_blank");
+      if (!w) return;
+      w.name = "__uz_cloaked";
       w.document.open();
       w.document.write(
-        '<!DOCTYPE html><html><head><script>window.__cloaked=true;<\/script></head><body>' +
-        '<script src="' + location.href + '?_t=' + Date.now() + '" onerror=""></script>' +
+        '<!DOCTYPE html><html><head>' +
+        '<meta charset="UTF-8"/>' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1"/>' +
+        '<title>UnblockZone</title>' +
+        '<style>*{margin:0;padding:0}html,body,iframe{width:100%;height:100%;border:none;display:block;overflow:hidden;background:#0d0d0f}</style>' +
+        '</head><body>' +
+        '<iframe src="' + realUrl + '" allowfullscreen></iframe>' +
         '</body></html>'
       );
-      w.document.close();
-      // After writing, replace the new window's content with a full iframe of the site
-      w.document.open();
-      w.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UnblockZone</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#0d0d0f}
-iframe{width:100%;height:100%;border:none;display:block}
-</style>
-</head>
-<body>
-<iframe src="${location.href}" allowfullscreen></iframe>
-</body>
-</html>`);
       w.document.close();
       window.close();
     })();
@@ -590,72 +575,43 @@ iframe{width:100%;height:100%;border:none;display:block}
     //  URL bar shows about:blank — bypassing URL filters.
     // ─────────────────────────────────────────────────
     function launchGame(game) {
-      const gameUrl = game.file;
-      const gameName = game.name;
+      var gameUrl = game.file;
+      var gameName = game.name;
+      var base = location.href.endsWith("/") ? location.href : location.href.substring(0, location.href.lastIndexOf("/") + 1);
+      var absoluteUrl = gameUrl.startsWith("http") ? gameUrl : base + gameUrl;
 
-      // Build a full absolute URL (works on GitHub Pages)
-      const base = window.location.href.replace(/\/[^/]*$/, "/");
-      const absoluteUrl = gameUrl.startsWith("http") ? gameUrl : base + gameUrl;
-
-      // Open a blank popup window
-      const popup = window.open("about:blank", "_blank",
-        "width=" + screen.availWidth +
-        ",height=" + screen.availHeight +
+      var popup = window.open("about:blank", "_blank",
+        "width=" + screen.availWidth + ",height=" + screen.availHeight +
         ",left=0,top=0,toolbar=no,menubar=no,scrollbars=no,status=no"
       );
 
-      if (!popup) {
-        // Fallback: use the inline modal if popups are blocked
-        openModal(gameUrl, gameName);
-        return;
-      }
+      if (!popup) { openModal(absoluteUrl, gameName); return; }
 
-      // Write a full page into the blank window
       popup.document.open();
-      popup.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>${gameName} — UnblockZone</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{width:100%;height:100%;background:#0d0d0f;overflow:hidden}
-  #bar{
-    position:fixed;top:0;left:0;right:0;height:44px;
-    background:#111115;border-bottom:1px solid #2a2a35;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 1rem;z-index:9999;font-family:'Rajdhani',sans-serif;
-  }
-  #bar a{
-    font-family:'Orbitron',sans-serif;font-weight:700;font-size:0.85rem;
-    letter-spacing:0.1em;background:linear-gradient(135deg,#00e5ff,#7c3aed);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    text-decoration:none;
-  }
-  #bar span{color:#888899;font-size:0.85rem;letter-spacing:0.05em}
-  #bar button{
-    background:#1a1a1f;border:1px solid #2a2a35;color:#e8e8f0;
-    padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;
-    font-family:'Rajdhani',sans-serif;font-size:0.82rem;
-  }
-  #bar button:hover{border-color:#00e5ff}
-  #frame-wrap{position:fixed;top:44px;left:0;right:0;bottom:0}
-  iframe{width:100%;height:100%;border:none;display:block}
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani&display=swap" rel="stylesheet"/>
-</head>
-<body>
-  <div id="bar">
-    <a href="javascript:void(0)" onclick="window.close()">UnblockZone</a>
-    <span>${gameName}</span>
-    <button onclick="document.getElementById('gf').requestFullscreen()">Fullscreen</button>
-  </div>
-  <div id="frame-wrap">
-    <iframe id="gf" src="${absoluteUrl}" allowfullscreen></iframe>
-  </div>
-</body>
-</html>`);
+      popup.document.write(
+        '<!DOCTYPE html><html><head>' +
+        '<meta charset="UTF-8"/>' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1"/>' +
+        '<title>' + gameName + ' \u2014 UnblockZone</title>' +
+        '<style>' +
+        '*{margin:0;padding:0;box-sizing:border-box}' +
+        'html,body{width:100%;height:100%;background:#0d0d0f;overflow:hidden}' +
+        '#bar{position:fixed;top:0;left:0;right:0;height:44px;background:#111115;border-bottom:1px solid #2a2a35;display:flex;align-items:center;justify-content:space-between;padding:0 1rem;z-index:9999;font-family:sans-serif}' +
+        '#bar a{font-weight:700;font-size:0.85rem;letter-spacing:0.1em;background:linear-gradient(135deg,#00e5ff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;cursor:pointer}' +
+        '#bar span{color:#888899;font-size:0.85rem}' +
+        '#bar button{background:#1a1a1f;border:1px solid #2a2a35;color:#e8e8f0;padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.82rem}' +
+        '#bar button:hover{border-color:#00e5ff}' +
+        '#fw{position:fixed;top:44px;left:0;right:0;bottom:0}' +
+        'iframe{width:100%;height:100%;border:none;display:block}' +
+        '</style></head><body>' +
+        '<div id="bar">' +
+        '<a onclick="window.close()">UnblockZone</a>' +
+        '<span>' + gameName + '</span>' +
+        '<button onclick="document.getElementById(\'gf\').requestFullscreen()">Fullscreen</button>' +
+        '</div>' +
+        '<div id="fw"><iframe id="gf" src="' + absoluteUrl + '" allowfullscreen></iframe></div>' +
+        '</body></html>'
+      );
       popup.document.close();
     }
 
